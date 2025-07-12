@@ -14,8 +14,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Ứng dụng ghi chú',
+
       home: LoginPage(),
-      theme: ThemeData(primarySwatch: Colors.teal),
+      theme: ThemeData(primarySwatch: Colors.teal,fontFamily: 'Roboto Serif'),
     );
   }
 }
