@@ -15,7 +15,16 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 }
-
+subprojects {
+    if (name == "google_mlkit_commons") {
+        afterEvaluate {
+            extensions.findByName("android")?.let {
+                val androidExt = it as com.android.build.gradle.LibraryExtension
+                androidExt.namespace = "com.google.mlkit.common"
+            }
+        }
+    }
+}
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }

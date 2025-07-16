@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 class EditNotePage extends StatefulWidget {
   final NoteModel note;
   final String token;
@@ -31,6 +31,9 @@ class _EditNotePageState extends State<EditNotePage> {
   bool _isRecording = false;
   String? _newAudioPath;
   late List<MediaFile> _visibleMediaFiles;
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  String _lastRecognized = '';
   @override
   void initState() {
     super.initState();
@@ -42,6 +45,7 @@ class _EditNotePageState extends State<EditNotePage> {
 
     _visibleMediaFiles = widget.note.mediaFiles.where((m) => !m.isDeleted).toList(); // ✅ danh sách media hiển thị
     _initializeRecorder();
+    _speech = stt.SpeechToText();
   }
 
 
@@ -267,6 +271,32 @@ class _EditNotePageState extends State<EditNotePage> {
     }
   }
 
+  Future<void> _startListening() async {
+    bool available = await _speech.initialize(
+      onStatus: (val) => print('onStatus: $val'),
+      onError: (val) => print('onError: $val'),
+    );
+
+    if (available) {
+      setState(() => _isListening = true);
+      _speech.listen(
+        onResult: (val) {
+          if (val.finalResult && val.recognizedWords != _lastRecognized) {
+            setState(() {
+              _lastRecognized = val.recognizedWords;
+              _contentController.text += ' ${val.recognizedWords}';
+            });
+          }
+        },
+        localeId: 'vi_VN',
+      );
+    }
+  }
+
+  void _stopListening() {
+    setState(() => _isListening = false);
+    _speech.stop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -465,6 +495,18 @@ class _EditNotePageState extends State<EditNotePage> {
           _buildToolbarButton(Icons.camera_alt_outlined, 'Camera', onTap: _pickImageFromCamera),
           _buildToolbarButton(Icons.upload_outlined, 'Upload', onTap: _pickImageFromGallery),
           _buildToolbarButton(_isRecording ? Icons.stop : Icons.mic_outlined, _isRecording ? 'Stop' : 'Ghi âm', onTap: _toggleRecording),
+          _buildToolbarButton(
+            _isListening ? Icons.hearing_disabled : Icons.hearing,
+            _isListening ? 'Dừng' : 'Nói',
+            onTap: () {
+              if (_isListening) {
+                _stopListening();
+              } else {
+                _startListening();
+              }
+            },
+          ),
+
         ],
       ),
     );

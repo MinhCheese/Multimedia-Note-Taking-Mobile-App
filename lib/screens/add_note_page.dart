@@ -7,6 +7,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+
 
 class AddNotePage extends StatefulWidget {
   final String token;
@@ -273,6 +275,30 @@ class _AddNotePageState extends State<AddNotePage> {
     setState(() => _isListening = false);
     _speech.stop();
   }
+  Future<void> _performOCRFromCamera() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile == null) return;
+
+    final inputImage = InputImage.fromFile(File(pickedFile.path));
+    final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    final recognizedText = await textRecognizer.processImage(inputImage);
+
+    await textRecognizer.close();
+
+    if (recognizedText.text.isNotEmpty) {
+      setState(() {
+        _contentController.text += '\n${recognizedText.text}';
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã chèn nội dung từ ảnh vào ghi chú')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không tìm thấy văn bản trong ảnh')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -452,6 +478,15 @@ class _AddNotePageState extends State<AddNotePage> {
                         ),
                       ),
 
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: ElevatedButton.icon(
+                        onPressed: _performOCRFromCamera,
+                        icon: const Icon(Icons.text_snippet),
+                        label: const Text('Tạo ghi chú từ ảnh'),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                      ),
+                    ),
                   ],
                 ),
               ),

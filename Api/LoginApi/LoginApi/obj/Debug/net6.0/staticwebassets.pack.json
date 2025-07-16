@@ -89,6 +89,10 @@
       "PackagePath": "staticwebassets\\uploads\\audio\\d47259b1-cfef-4b74-a95d-e4011f5c2bbb.wav"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\audio\\db16a428-3d8a-4a32-b533-2290279ab5a9.aac",
+      "PackagePath": "staticwebassets\\uploads\\audio\\db16a428-3d8a-4a32-b533-2290279ab5a9.aac"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\audio\\e3d8b4d8-a1c3-424d-9ec1-ce95cf8df4b1.m4a",
       "PackagePath": "staticwebassets\\uploads\\audio\\e3d8b4d8-a1c3-424d-9ec1-ce95cf8df4b1.m4a"
     },
@@ -113,6 +117,10 @@
       "PackagePath": "staticwebassets\\uploads\\images\\18621f7f-2ae2-4bd2-bc16-769f5c044eac.jpg"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\27d43352-7c9c-481c-a445-f8182c91f607.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\27d43352-7c9c-481c-a445-f8182c91f607.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\2bdcdda6-36cf-44db-9c8b-811c1d688b4a.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\2bdcdda6-36cf-44db-9c8b-811c1d688b4a.jpg"
     },
@@ -123,6 +131,10 @@
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\5848dd5d-eea5-44b2-a0c5-9f4fffb85a1a.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\5848dd5d-eea5-44b2-a0c5-9f4fffb85a1a.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\5e4baefb-a491-4729-89ec-e6ab7bcd5ad6.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\5e4baefb-a491-4729-89ec-e6ab7bcd5ad6.jpg"
     },
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\76a680af-3689-4b4f-9894-bfaa720587fa.jpg",
