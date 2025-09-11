@@ -5,7 +5,8 @@ using LoginApi.Data;
 namespace LoginApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/Media")]
+
     public class MediaController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -28,11 +29,35 @@ namespace LoginApi.Controllers
                     m.FileType,
                     m.FilePath,
                     m.NoteId,
-                    m.UploadedAt
+                    m.UploadedAt,
+                    m.DisplayName
                 })
                 .ToListAsync();
 
             return Ok(files);
         }
+
+        public class RenameMediaRequest
+        {
+            public string NewDisplayName { get; set; } = string.Empty;
+        }
+
+        [HttpPut("{id}/rename")]
+        public async Task<IActionResult> RenameMedia(Guid id, [FromBody] RenameMediaRequest request)
+        {
+            var media = await _context.MediaFiles.FindAsync(id);
+            if (media == null)
+            {
+                return NotFound();
+            }
+
+            media.DisplayName = request.NewDisplayName;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+
+
     }
 }

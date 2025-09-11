@@ -25,10 +25,13 @@ namespace LoginApi.Models
         [Column("is_deleted")]
         public bool IsDeleted { get; set; } = false;
 
-        [Column("uploaded_at")] // ✅ đúng tên cột trong DB
+        [Column("uploaded_at")] 
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
 
         [ForeignKey("NoteId")]
         public Note? Note { get; set; }
+
+        [Column("display_name")]
+        public string? DisplayName { get; set; }
     }
 }

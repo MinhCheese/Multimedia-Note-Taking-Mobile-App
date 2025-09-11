@@ -41,6 +41,7 @@ namespace LoginApi.Controllers
                     {
                         m.FileType,
                         m.FilePath,
+                        m.DisplayName,
                         m.IsDeleted
                     }).ToList()
                 })
@@ -164,7 +165,7 @@ namespace LoginApi.Controllers
 
 
         [HttpPost("upload-audio")]
-        public async Task<IActionResult> UploadAudio([FromForm] IFormFile file, [FromForm] Guid noteId)
+        public async Task<IActionResult> UploadAudio([FromForm] IFormFile file, [FromForm] Guid noteId, [FromForm] string displayName)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "File rỗng" });
@@ -189,6 +190,7 @@ namespace LoginApi.Controllers
                 FileType = "audio",
                 FilePath = relativePath,
                 UploadedAt = DateTime.UtcNow,
+                DisplayName = displayName,
                 IsDeleted = false
             };
 

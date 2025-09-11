@@ -5,6 +5,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{D663929F-CB31-407C-85A8-830329916C5D}|LoginApi\\LoginApi.csproj|c:\\flutter\\thuc_tap\\api\\loginapi\\loginapi\\controllers\\mediacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D663929F-CB31-407C-85A8-830329916C5D}|LoginApi\\LoginApi.csproj|solutionrelative:loginapi\\controllers\\mediacontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D663929F-CB31-407C-85A8-830329916C5D}|LoginApi\\LoginApi.csproj|C:\\Flutter\\thuc_tap\\Api\\LoginApi\\loginapi\\controllers\\notescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D663929F-CB31-407C-85A8-830329916C5D}|LoginApi\\LoginApi.csproj|solutionrelative:loginapi\\controllers\\notescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,8 +18,20 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NotesController.cs",
+              "DocumentMoniker": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\Controllers\\NotesController.cs",
+              "RelativeDocumentMoniker": "LoginApi\\Controllers\\NotesController.cs",
+              "ToolTip": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\Controllers\\NotesController.cs",
+              "RelativeToolTip": "LoginApi\\Controllers\\NotesController.cs",
+              "ViewState": "AQIAAKMAAAAAAAAAAAAmwLMAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-18T02:58:59.004Z"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -24,9 +40,9 @@
               "RelativeDocumentMoniker": "LoginApi\\Controllers\\MediaController.cs",
               "ToolTip": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\Controllers\\MediaController.cs",
               "RelativeToolTip": "LoginApi\\Controllers\\MediaController.cs",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAAABMAAABHAAAA",
+              "ViewState": "AQIAACwAAAAAAAAAAAAQwDcAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-09T05:28:40.995Z",
+              "WhenOpened": "2025-07-17T10:51:11.951Z",
               "EditorCaption": ""
             }
           ]

@@ -108,6 +108,7 @@ class NoteService {
     required String token,
     required String noteId,
     required String filePath,
+    required String displayName,
   }) async {
     final uri = Uri.parse('$baseUrl/api/notes/upload-audio');
 
@@ -120,6 +121,7 @@ class NoteService {
     final request = http.MultipartRequest('POST', uri)
       ..headers['Authorization'] = 'Bearer $token'
       ..fields['noteId'] = noteId
+      ..fields['displayName'] = displayName
       ..files.add(
         await http.MultipartFile.fromPath(
           'file',

@@ -26,4 +26,34 @@ class MediaService {
     }
   }
 
+  static Future<void> renameAudioFile(String mediaId, String newDisplayName) async {
+    final url = Uri.parse('$baseUrl/api/media/$mediaId/rename');
+
+    final body = json.encode({
+      'newDisplayName': newDisplayName, // phải dùng đúng key "newDisplayName"
+    });
+
+    print('Sending PUT to $url with body: $body');
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*', // thêm dòng này nếu cần tương thích với backend
+      },
+      body: body,
+    );
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 204) {
+      print('Rename successful');
+    } else {
+      print('Rename failed: ${response.statusCode} - ${response.body}');
+      throw Exception('Failed to rename audio file');
+    }
+  }
+
+
 }

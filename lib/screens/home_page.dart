@@ -6,7 +6,7 @@ import 'package:thuc_tap/services/note_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thuc_tap/screens/add_note_page.dart';
 import 'package:thuc_tap/screens/edit_note_page.dart';
-import 'package:thuc_tap/screens/setting_page.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -263,6 +263,8 @@ class _HomePageState extends State<HomePage> {
                                       const SizedBox(height: 8),
                                       Text(
                                         note.content,
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                           fontSize: 14,
                                           color: Colors.black54,

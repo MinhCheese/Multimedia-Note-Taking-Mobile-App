@@ -3,12 +3,13 @@ class MediaFile {
   final String fileType; // 'audio', 'image', 'video'
   final String filePath;
   final bool isDeleted;
-
+  String? displayName;
   MediaFile({
     this.id,
     required this.fileType,
     required this.filePath,
     this.isDeleted = false,
+    this.displayName,
   });
 
   factory MediaFile.fromJson(Map<String, dynamic> json) {
@@ -17,6 +18,7 @@ class MediaFile {
       fileType: json['fileType'],
       filePath: json['filePath'],
       isDeleted: json['isDeleted'] ?? false,
+      displayName: json['displayName'],
     );
   }
 }

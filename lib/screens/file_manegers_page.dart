@@ -375,6 +375,10 @@ class _FileManagerPage extends State<FileManagerPage>
   }
 
   Widget _buildAudioItem(MediaFile file) {
+    final displayName = (file.displayName ?? '').trim().isNotEmpty
+        ? file.displayName!
+        : file.filePath.split('/').last;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -389,7 +393,23 @@ class _FileManagerPage extends State<FileManagerPage>
           ),
         ],
       ),
-      child: AudioPlayerWidget(audioUrl: '${MediaService.baseUrl}/${file.filePath}')
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              displayName,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          AudioPlayerWidget(audioUrl: '${MediaService.baseUrl}/${file.filePath}'),
+        ],
+      ),
     );
   }
+
 }

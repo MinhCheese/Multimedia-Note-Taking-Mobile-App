@@ -35,7 +35,7 @@ class _AddNotePageState extends State<AddNotePage> {
   String? _audioPath;
 
   final ImagePicker _picker = ImagePicker();
-
+  String? _audioDisplayName;
   @override
   void initState() {
     super.initState();
@@ -76,8 +76,13 @@ class _AddNotePageState extends State<AddNotePage> {
         _audioPath = path;
       });
     } else {
-      await _recorder.stopRecorder();
+      final recordedPath = await _recorder.stopRecorder();
       setState(() => _isRecording = false);
+
+      if (recordedPath != null) {
+        _promptRenameAudio(recordedPath);
+      }
+
     }
   }
 
@@ -102,7 +107,7 @@ class _AddNotePageState extends State<AddNotePage> {
     }
     if (selectedLabel.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('❗ Vui lòng chọn nhãn cho ghi chú')),
+        const SnackBar(content: Text(' Vui lòng chọn nhãn cho ghi chú')),
       );
       return;
     }
@@ -128,6 +133,7 @@ class _AddNotePageState extends State<AddNotePage> {
             token: widget.token,
             noteId: noteId,
             filePath: _audioPath!,
+            displayName: _audioDisplayName ?? _audioPath!.split('/').last,
           );
         }
 
@@ -299,6 +305,52 @@ class _AddNotePageState extends State<AddNotePage> {
       );
     }
   }
+
+  Future<void> _promptRenameAudio(String originalPath) async {
+    final controller = TextEditingController();
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Đặt tên file ghi âm'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'Nhập tên file (không cần đuôi .aac)'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Huỷ')),
+          TextButton(
+            onPressed: () {
+              final name = controller.text.trim();
+              if (name.isNotEmpty) {
+                Navigator.pop(context, name);
+              }
+            },
+            child: const Text('Lưu'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null && result.isNotEmpty) {
+      final dir = await getTemporaryDirectory();
+      final newPath = '${dir.path}/$result.aac';
+
+      final originalFile = File(originalPath);
+      await originalFile.rename(newPath);
+
+      setState(() {
+        _audioPath = newPath;
+        _audioDisplayName = '$result.aac'; // Lưu tên người dùng đặt
+      });
+
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('✅ Đã lưu file ghi âm: $result.aac')),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {

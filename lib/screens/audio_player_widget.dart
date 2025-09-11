@@ -3,7 +3,8 @@ import 'package:audioplayers/audioplayers.dart';
 
 class AudioPlayerWidget extends StatefulWidget {
   final String audioUrl;
-  const AudioPlayerWidget({super.key, required this.audioUrl});
+  final String? fileName;
+  const AudioPlayerWidget({super.key, required this.audioUrl,this.fileName,});
 
   @override
   State<AudioPlayerWidget> createState() => _AudioPlayerWidgetState();
@@ -31,19 +32,36 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        IconButton(
-          icon: Icon(_isPlaying ? Icons.pause_circle : Icons.play_circle),
-          onPressed: _togglePlayback,
-        ),
-        Expanded(
-          child: Text(
-            widget.audioUrl.split('/').last,
-            overflow: TextOverflow.ellipsis,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.fileName != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                widget.fileName!,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(
+                  _isPlaying ? Icons.pause_circle : Icons.play_circle,
+                  size: 32,
+                ),
+                onPressed: _togglePlayback,
+              ),
+            ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

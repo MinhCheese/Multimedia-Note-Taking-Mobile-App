@@ -9,6 +9,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:path/path.dart' as path;
+import 'package:thuc_tap/services/media_service.dart';
+
 class EditNotePage extends StatefulWidget {
   final NoteModel note;
   final String token;
@@ -43,7 +46,7 @@ class _EditNotePageState extends State<EditNotePage> {
     _contentFocusNode = FocusNode();
     selectedLabel = widget.note.tags.isNotEmpty ? widget.note.tags.first : '';
 
-    _visibleMediaFiles = widget.note.mediaFiles.where((m) => !m.isDeleted).toList(); // ✅ danh sách media hiển thị
+    _visibleMediaFiles = widget.note.mediaFiles.where((m) => !m.isDeleted).toList();
     _initializeRecorder();
     _speech = stt.SpeechToText();
   }
@@ -74,11 +77,15 @@ class _EditNotePageState extends State<EditNotePage> {
 
     if (!_isRecording) {
       final dir = await getTemporaryDirectory();
-      final filePath = '${dir.path}/note_record_${DateTime.now().millisecondsSinceEpoch}.aac';
+      final fileName = await _askFileName(); // Hàm popup nhập tên
+      if (fileName == null || fileName.trim().isEmpty) return;
+
+      final sanitizedFileName = fileName.trim().replaceAll(RegExp(r'[^\w\s-]'), '');
+      final filePath = path.join(dir.path, '$sanitizedFileName.aac');
 
       await _recorder.startRecorder(
         toFile: filePath,
-          codec: Codec.aacADTS,
+        codec: Codec.aacADTS,
       );
 
       setState(() {
@@ -100,28 +107,36 @@ class _EditNotePageState extends State<EditNotePage> {
           return;
         }
 
+        final displayName = path.basenameWithoutExtension(_newAudioPath!);
+
         final uploadResult = await NoteService.uploadAudioFile(
           token: widget.token,
           noteId: widget.note.id,
           filePath: _newAudioPath!,
+          displayName: displayName,
         );
 
         if (uploadResult != null) {
           final filePathFromServer = uploadResult['filePath'];
           setState(() {
-            widget.note.mediaFiles.add(MediaFile(filePath: filePathFromServer, fileType: 'audio'));
+            widget.note.mediaFiles.add(MediaFile(
+              filePath: filePathFromServer,
+              fileType: 'audio',
+              displayName: displayName,
+            ));
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã ghi âm và lưu thành công')),
+            const SnackBar(content: Text(' Ghi âm và lưu thành công')),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Lưu file ghi âm thất bại')),
+            const SnackBar(content: Text(' Lưu file ghi âm thất bại')),
           );
         }
       }
     }
   }
+
 
   Future<void> _pickImageFromCamera() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
@@ -224,6 +239,7 @@ class _EditNotePageState extends State<EditNotePage> {
       if (success) {
         setState(() {
           _visibleMediaFiles.removeWhere((m) => m.filePath == imageFile.filePath);
+          widget.note.mediaFiles.removeWhere((m) => m.filePath == imageFile.filePath);
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('🗑️ Ảnh đã được xoá')),
@@ -261,11 +277,11 @@ class _EditNotePageState extends State<EditNotePage> {
           _visibleMediaFiles.removeWhere((m) => m.filePath == audioFile.filePath);
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('🗑️ Ghi âm đã được xoá')),
+          const SnackBar(content: Text('Ghi âm đã được xoá')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('❌ Xoá ghi âm thất bại')),
+          const SnackBar(content: Text('Xoá ghi âm thất bại')),
         );
       }
     }
@@ -297,6 +313,88 @@ class _EditNotePageState extends State<EditNotePage> {
     setState(() => _isListening = false);
     _speech.stop();
   }
+
+  Future<String?> _askFileName() async {
+    String? fileName;
+    await showDialog(
+      context: context,
+      builder: (context) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: const Text('Đặt tên cho file ghi âm'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(hintText: 'Tên file...'),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Huỷ')),
+            TextButton(
+              onPressed: () {
+                fileName = controller.text.trim();
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+    return fileName;
+  }
+
+  Future<void> _renameAudio(MediaFile audio) async {
+    final controller = TextEditingController(text: audio.displayName?.replaceAll('.aac', '') ?? '');
+
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Đổi tên file ghi âm'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'Nhập tên mới'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Huỷ'),
+          ),
+          TextButton(
+            onPressed: () {
+              final name = controller.text.trim();
+              if (name.isNotEmpty) {
+                Navigator.pop(context, name);
+              }
+            },
+            child: const Text('Lưu'),
+          ),
+        ],
+      ),
+    );
+
+    if (newName != null &&
+        newName.isNotEmpty &&
+        newName != audio.displayName) {
+      try {
+        await MediaService.renameAudioFile(audio.id!, newName);
+
+        setState(() {
+          audio.displayName = newName;
+        });
+
+        // Hiển thị SnackBar báo thành công (nếu bạn muốn)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đổi tên thành công')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đổi tên thất bại')),
+        );
+      }
+    }
+
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -426,17 +524,51 @@ class _EditNotePageState extends State<EditNotePage> {
                               return Stack(
                                 children: [
                                   Container(
-                                    margin: const EdgeInsets.only(bottom: 8, right: 40),
-                                    child: AudioPlayerWidget(audioUrl: audioUrl),
+                                    margin: const EdgeInsets.only(bottom: 12, right: 40),
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade200,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.grey.shade300),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        if ((audio.displayName ?? '').trim().isNotEmpty)
+                                          Padding(
+                                            padding: const EdgeInsets.only(bottom: 8),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    audio.displayName!,
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                ),
+                                                // IconButton(
+                                                //   icon: const Icon(Icons.edit, size: 18),
+                                                //   onPressed: () => _renameAudio(audio),
+                                                //   tooltip: 'Đổi tên',
+                                                // )
+                                              ],
+                                            ),
+                                          ),
+
+                                        AudioPlayerWidget(audioUrl: audioUrl),
+                                      ],
+                                    ),
                                   ),
                                   Positioned(
-                                    top: 0,
+                                    top: 4,
                                     right: 0,
                                     child: GestureDetector(
                                       onTap: () => _deleteAudio(audio),
                                       child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.5),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.black54,
                                           shape: BoxShape.circle,
                                         ),
                                         padding: const EdgeInsets.all(4),
@@ -447,6 +579,8 @@ class _EditNotePageState extends State<EditNotePage> {
                                 ],
                               );
                             }),
+
+
                           ],
                         ),
                       )
