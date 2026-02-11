@@ -29,13 +29,16 @@ class NoteModel {
   final String content;
   final List<String> tags;
   final List<MediaFile> mediaFiles;
-
+  final DateTime? reminderAt;
+  final DateTime createdAt;
   NoteModel({
     required this.id,
     required this.title,
     required this.content,
     required this.tags,
     required this.mediaFiles,
+    this.reminderAt,
+    required this.createdAt,
   });
 
   factory NoteModel.fromJson(Map<String, dynamic> json) {
@@ -48,6 +51,12 @@ class NoteModel {
           .map((item) => MediaFile.fromJson(item))
           .where((file) => file.isDeleted == false)
           .toList(),
+      reminderAt: json['reminderAt'] != null
+          ? DateTime.parse(json['reminderAt'])
+          : (json['reminder_at'] != null ? DateTime.parse(json['reminder_at']) : null),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : (json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now()),
     );
   }
 

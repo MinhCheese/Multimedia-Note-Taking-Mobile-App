@@ -25,6 +25,7 @@ class NoteService {
     required String title,
     required String content,
     required List<String> tags,
+    DateTime? reminderAt,
   }) async {
     final response = await http.post(
       Uri.parse('$baseUrl/api/Notes'),
@@ -37,6 +38,7 @@ class NoteService {
         'title': title,
         'content': content,
         'tags': tags,
+        'reminderAt': reminderAt?.toIso8601String(),
       }),
     );
 
@@ -54,6 +56,7 @@ class NoteService {
     required String title,
     required String content,
     required List<String> tags,
+    DateTime? reminderAt,
   }) async {
     final response = await http.put(
       Uri.parse('$baseUrl/api/Notes/$noteId'),
@@ -65,6 +68,7 @@ class NoteService {
         'title': title,
         'content': content,
         'tags': tags,
+        'reminderAt': reminderAt?.toIso8601String(),
       }),
     );
 

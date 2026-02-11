@@ -8,8 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-
-
+import 'package:intl/intl.dart';
+import 'package:thuc_tap/services/notification_service.dart';
 class AddNotePage extends StatefulWidget {
   final String token;
 
@@ -36,11 +36,57 @@ class _AddNotePageState extends State<AddNotePage> {
 
   final ImagePicker _picker = ImagePicker();
   String? _audioDisplayName;
+  DateTime? _reminderTime;
   @override
   void initState() {
     super.initState();
     _initializeRecorder();
     _speech = stt.SpeechToText();
+  }
+
+  Future<void> _pickDateTime() async {
+    FocusScope.of(context).unfocus();
+    final now = DateTime.now();
+    final initialDate = _reminderTime ?? now;
+
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: now.subtract(const Duration(minutes: 1)),
+      lastDate: DateTime(now.year + 5),
+    );
+
+    if (pickedDate == null) return;
+    if (!mounted) return;
+
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initialDate),
+    );
+
+    if (pickedTime == null) return;
+
+    setState(() {
+      _reminderTime = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
+    });
+  }
+
+  String _getRemainingTime(DateTime target) {
+    final now = DateTime.now();
+    final difference = target.difference(now);
+    if (difference.isNegative) return 'Đã quá hạn';
+    final days = difference.inDays;
+    final hours = difference.inHours % 24;
+    final minutes = difference.inMinutes % 60;
+    if (days > 0) return 'Còn $days ngày $hours giờ';
+    if (hours > 0) return 'Còn $hours giờ $minutes phút';
+    return 'Còn $minutes phút';
   }
 
   Future<void> _initializeRecorder() async {
@@ -100,61 +146,92 @@ class _AddNotePageState extends State<AddNotePage> {
     final content = _contentController.text.trim();
 
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập tiêu đề')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập tiêu đề')));
       return;
     }
     if (selectedLabel.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(' Vui lòng chọn nhãn cho ghi chú')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng chọn nhãn')));
       return;
     }
 
+    // 1. Hiện Loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('user_id');
-    if (userId == null) return;
+    if (userId == null) {
+      Navigator.pop(context); // Tắt loading nếu lỗi user
+      return;
+    }
 
+    // 2. Tạo Note (Quan trọng nhất)
     final success = await NoteService.createNote(
       token: widget.token,
       userId: userId,
       title: title,
       content: content,
       tags: selectedLabel.isNotEmpty ? [selectedLabel] : [],
+      reminderAt: _reminderTime,
     );
 
+    // 3. Tắt Loading ngay lập tức khi có kết quả tạo
+    if (mounted) Navigator.pop(context);
+
     if (success) {
-      final noteId = await NoteService.getLatestNoteId(userId, widget.token);
-      if (noteId != null) {
-        // ✅ Upload audio nếu có
-        if (_audioPath != null) {
-          await NoteService.uploadAudioFile(
-            token: widget.token,
-            noteId: noteId,
-            filePath: _audioPath!,
-            displayName: _audioDisplayName ?? _audioPath!.split('/').last,
-          );
-        }
+      //  PHẦN TÁC VỤ PHỤ (Notification, Upload ảnh/ghi âm)
+      // Cho vào try-catch để nếu lỗi upload thì cũng KHÔNG chặn việc quay về Home
+      try {
+        final noteId = await NoteService.getLatestNoteId(userId, widget.token);
 
-        // ✅ Upload tất cả ảnh nếu có
-        for (String imagePath in _selectedImagePaths) {
-          await NoteService.uploadImageFile(
-            token: widget.token,
-            noteId: noteId,
-            filePath: imagePath,
-          );
-        }
+        if (noteId != null) {
+          // A. Đặt thông báo
+          if (_reminderTime != null) {
+            final notificationId = noteId.toString().hashCode;
+            await NotificationService.scheduleNotification(
+              id: notificationId,
+              title: title.isEmpty ? 'Nhắc nhở' : title,
+              body: content.isNotEmpty ? content : 'Đã đến giờ!',
+              scheduledTime: _reminderTime!,
+            );
+          }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('📒 Ghi chú đã được lưu')),
-        );
-        Navigator.pop(context, true);
+          // B. Upload Audio
+          if (_audioPath != null) {
+            await NoteService.uploadAudioFile(
+              token: widget.token,
+              noteId: noteId,
+              filePath: _audioPath!,
+              displayName: _audioDisplayName ?? _audioPath!.split('/').last,
+            );
+          }
+
+          // C. Upload Ảnh
+          for (String imagePath in _selectedImagePaths) {
+            await NoteService.uploadImageFile(
+              token: widget.token,
+              noteId: noteId,
+              filePath: imagePath,
+            );
+          }
+        }
+      } catch (e) {
+        print(" Lỗi phụ (upload/notification): $e");
       }
+
+      // 4. ĐIỀU HƯỚNG VỀ HOME (Nằm ngoài cùng, chắc chắn chạy)
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(' Ghi chú đã được lưu')));
+        Navigator.pop(context, true); // Trả về true để Home reload danh sách
+      }
+
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('❌ Lưu ghi chú thất bại')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(' Lưu thất bại')));
+      }
     }
   }
 
@@ -259,8 +336,8 @@ class _AddNotePageState extends State<AddNotePage> {
 
   Future<void> _startListening() async {
     bool available = await _speech.initialize(
-      onStatus: (val) => print('🟡 onStatus: $val'),
-      onError: (val) => print('🔴 onError: $val'),
+      onStatus: (val) => print(' onStatus: $val'),
+      onError: (val) => print(' onError: $val'),
     );
     if (available) {
       setState(() => _isListening = true);
@@ -346,7 +423,7 @@ class _AddNotePageState extends State<AddNotePage> {
 
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('✅ Đã lưu file ghi âm: $result.aac')),
+        SnackBar(content: Text(' Đã lưu file ghi âm: $result.aac')),
       );
     }
   }
@@ -426,6 +503,42 @@ class _AddNotePageState extends State<AddNotePage> {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    if (_reminderTime != null)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.orange.shade200),
+                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)],
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.alarm, color: Colors.deepOrange, size: 24),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Hạn chót: ${DateFormat('HH:mm - dd/MM/yyyy').format(_reminderTime!)}',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                  ),
+                                  Text(
+                                    _getRemainingTime(_reminderTime!),
+                                    style: const TextStyle(color: Colors.green, fontSize: 13, fontStyle: FontStyle.italic),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close, color: Colors.grey),
+                              onPressed: () => setState(() => _reminderTime = null),
+                            )
+                          ],
+                        ),
+                      ),
                     _buildInputContainer(
                       height: 300,
                       child: TextField(
@@ -551,6 +664,10 @@ class _AddNotePageState extends State<AddNotePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  _buildToolbarButton(
+                    icon: Icons.alarm,
+                    onTap: _pickDateTime,
+                  ),
                   _buildToolbarButton(
                     icon: Icons.camera_alt_outlined,
                     onTap: () => _pickImage(ImageSource.camera),

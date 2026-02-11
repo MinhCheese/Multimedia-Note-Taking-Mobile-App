@@ -11,7 +11,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:path/path.dart' as path;
 import 'package:thuc_tap/services/media_service.dart';
-
+import 'package:intl/intl.dart';
+import 'package:thuc_tap/services/notification_service.dart';
 class EditNotePage extends StatefulWidget {
   final NoteModel note;
   final String token;
@@ -37,11 +38,13 @@ class _EditNotePageState extends State<EditNotePage> {
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _lastRecognized = '';
+  DateTime? _reminderTime;
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.note.title);
     _contentController = TextEditingController(text: widget.note.content);
+    _reminderTime = widget.note.reminderAt;
     _titleFocusNode = FocusNode();
     _contentFocusNode = FocusNode();
     selectedLabel = widget.note.tags.isNotEmpty ? widget.note.tags.first : '';
@@ -51,6 +54,40 @@ class _EditNotePageState extends State<EditNotePage> {
     _speech = stt.SpeechToText();
   }
 
+
+  Future<void> _pickDateTime() async {
+    final now = DateTime.now();
+    final initialDate = _reminderTime ?? now;
+
+    // Day
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: now.subtract(const Duration(minutes: 1)), // Cho phép chọn từ hiện tại
+      lastDate: DateTime(now.year + 5),
+    );
+
+    if (pickedDate == null) return;
+    if (!mounted) return;
+
+    // Hour
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initialDate),
+    );
+
+    if (pickedTime == null) return;
+
+    setState(() {
+      _reminderTime = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
+    });
+  }
 
   Future<void> _initializeRecorder() async {
     await _recorder.openRecorder();
@@ -80,7 +117,8 @@ class _EditNotePageState extends State<EditNotePage> {
       final fileName = await _askFileName(); // Hàm popup nhập tên
       if (fileName == null || fileName.trim().isEmpty) return;
 
-      final sanitizedFileName = fileName.trim().replaceAll(RegExp(r'[^\w\s-]'), '');
+      // Sử dụng bộ lọc an toàn hơn cho tiếng Việt
+      final sanitizedFileName = fileName.trim().replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
       final filePath = path.join(dir.path, '$sanitizedFileName.aac');
 
       await _recorder.startRecorder(
@@ -171,30 +209,106 @@ class _EditNotePageState extends State<EditNotePage> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('❌ Lỗi khi tải ảnh lên')),
+        const SnackBar(content: Text(' Lỗi khi tải ảnh lên')),
       );
     }
   }
 
   Future<void> _updateNote() async {
+    final title = _titleController.text.trim();
+    final content = _contentController.text.trim();
+
+    // 1. Hiện Loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // 2. Gọi API Cập nhật
     final success = await NoteService.updateNote(
       token: widget.token,
       noteId: widget.note.id,
-      title: _titleController.text.trim(),
-      content: _contentController.text.trim(),
+      title: title,
+      content: content,
       tags: selectedLabel.isNotEmpty ? [selectedLabel] : [],
+      reminderAt: _reminderTime,
     );
-    if (success) Navigator.pop(context, true);
+
+    // 3. Tắt Loading ngay lập tức
+    if (mounted) Navigator.pop(context);
+
+    if (success) {
+      // 4. Xử lý thông báo (Trong try-catch để không chặn Navigation)
+      try {
+        final notificationId = widget.note.id.hashCode;
+
+        if (_reminderTime != null) {
+          // Nếu có giờ hẹn -> Đặt lịch (Update lại lịch cũ)
+          await NotificationService.scheduleNotification(
+            id: notificationId,
+            title: title.isEmpty ? 'Nhắc nhở' : title,
+            body: content.isNotEmpty ? content : 'Đến giờ hẹn cho ghi chú này!',
+            scheduledTime: _reminderTime!,
+          );
+        } else {
+          // Nếu người dùng đã xóa giờ hẹn -> Hủy thông báo cũ
+          await NotificationService.cancelNotification(notificationId);
+        }
+      } catch (e) {
+        print(" Lỗi cập nhật thông báo: $e");
+      }
+
+      // 5. Về Home (Chắc chắn chạy)
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(' Đã cập nhật ghi chú')));
+        Navigator.pop(context, true); // Trả về true để Home reload
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(' Cập nhật thất bại')));
+      }
+    }
   }
 
   Future<void> _deleteNote() async {
+    // 1. Hỏi xác nhận
     final confirm = await DeleteNoteDialog.show(context);
-    if (confirm == true) {
-      final success = await NoteService.deleteNote(
-        token: widget.token,
-        noteId: widget.note.id,
-      );
-      if (success) Navigator.pop(context, true);
+    if (confirm != true) return;
+
+    // 2. Hiện Loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // 3. Gọi API Xóa
+    final success = await NoteService.deleteNote(
+      token: widget.token,
+      noteId: widget.note.id,
+    );
+
+    // 4. Tắt Loading
+    if (mounted) Navigator.pop(context);
+
+    if (success) {
+      // 5. Hủy thông báo đi kèm (Try-catch)
+      try {
+        await NotificationService.cancelNotification(widget.note.id.hashCode);
+      } catch (e) {
+        print(" Lỗi hủy thông báo: $e");
+      }
+
+      // 6. Về Home
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(' Đã xoá ghi chú')));
+        Navigator.pop(context, true); // Trả về true để reload list
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Xoá thất bại')));
+      }
     }
   }
 
@@ -448,6 +562,53 @@ class _EditNotePageState extends State<EditNotePage> {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    if (_reminderTime != null)
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.orange.shade200),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2)),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.alarm, color: Colors.deepOrange, size: 24),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Hạn chót: ${DateFormat('HH:mm - dd/MM/yyyy').format(_reminderTime!)}',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _getRemainingTime(_reminderTime!), // Hàm tính thời gian còn lại
+                                    style: TextStyle(
+                                        color: _reminderTime!.isBefore(DateTime.now()) ? Colors.red : Colors.green,
+                                        fontSize: 13,
+                                        fontStyle: FontStyle.italic
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close, color: Colors.grey),
+                              onPressed: () {
+                                setState(() {
+                                  _reminderTime = null; // Xoá lịch hẹn
+                                });
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: 16),
                     _buildInputContainer(
                       height: 400,
                       child: TextField(
@@ -626,6 +787,11 @@ class _EditNotePageState extends State<EditNotePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          _buildToolbarButton(
+              Icons.alarm,
+              'Đặt lịch',
+              onTap: _pickDateTime
+          ),
           _buildToolbarButton(Icons.camera_alt_outlined, 'Camera', onTap: _pickImageFromCamera),
           _buildToolbarButton(Icons.upload_outlined, 'Upload', onTap: _pickImageFromGallery),
           _buildToolbarButton(_isRecording ? Icons.stop : Icons.mic_outlined, _isRecording ? 'Stop' : 'Ghi âm', onTap: _toggleRecording),
@@ -678,7 +844,26 @@ class _EditNotePageState extends State<EditNotePage> {
       child: child,
     );
   }
+  String _getRemainingTime(DateTime target) {
+    final now = DateTime.now();
+    final difference = target.difference(now);
 
+    if (difference.isNegative) {
+      return 'Đã quá hạn';
+    }
+
+    final days = difference.inDays;
+    final hours = difference.inHours % 24;
+    final minutes = difference.inMinutes % 60;
+
+    if (days > 0) {
+      return 'Còn $days ngày $hours giờ nữa';
+    } else if (hours > 0) {
+      return 'Còn $hours giờ $minutes phút nữa';
+    } else {
+      return 'Còn $minutes phút nữa';
+    }
+  }
   void _showLabelPicker() {
     showModalBottomSheet(
       context: context,

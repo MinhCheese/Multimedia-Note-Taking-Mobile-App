@@ -5,7 +5,7 @@ import 'package:thuc_tap/models/user_register_dto.dart';
 class AuthService {
   //Test may that 'http://192.168.100.29:5023' va dotnet run --urls=http://0.0.0.0:5023
   //test may ao 'http://10.0.2.2:5023'
-  //'http://192.168.102.19:5023'
+  //'http://192.168.100.29:5023'
   static const String baseUrl = 'http://192.168.100.29:5023';
 
   static Future<UserLoginResponse?> login(String email, String password) async {

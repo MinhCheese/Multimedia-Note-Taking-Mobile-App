@@ -13,13 +13,35 @@ class AudioPlayerWidget extends StatefulWidget {
 class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   final AudioPlayer _player = AudioPlayer();
   bool _isPlaying = false;
-
+  Duration _duration=Duration.zero; // Tổng thời lượng của file
+  Duration _position=Duration.zero;// Vị trí phát hiện tại
   @override
   void dispose() {
     _player.dispose();
     super.dispose();
   }
-
+  @override
+  void initState()
+  {
+    super.initState();
+    //Lấy tổng thời lượng của video khi tải
+    _player.onDurationChanged.listen((d){
+      setState(() =>_duration=d);
+    });
+    //Lấy thời gian hiện tại của bản ghi âm(đơn vị mili giây)
+    _player.onPositionChanged.listen((p){
+      setState(() =>_position=p);
+    });
+    //Chỉnh trạng thái thanh trang thái khi nghe hết
+    _player.onPlayerComplete.listen((event){
+      setState(() {
+        _isPlaying=false;
+        _position=Duration.zero;
+      });
+    //Không được thiếu:Thiết lập nguồn âm thanh ngay sau khi khởi tạo có được tổng thời lượng
+    _player.setSourceUrl(widget.audioUrl);
+    });
+  }
   void _togglePlayback() async {
     if (_isPlaying) {
       await _player.pause();
@@ -49,19 +71,52 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(
-                  _isPlaying ? Icons.pause_circle : Icons.play_circle,
-                  size: 32,
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    //1.Nút play/pause
+                    IconButton(
+                      icon: Icon(
+                        _isPlaying ? Icons.pause_circle : Icons.play_circle,
+                        size: 32,
+                      ),
+                      onPressed: _togglePlayback,
+                    ),
+                    //2.Thanh trượt video slider
+                    Expanded(child: Slider(
+                        min: 0.0,
+                        max: _duration.inSeconds.toDouble(),
+                        //Đảm bảo value không vươ quá max ==>Tránh lỗi tràn video
+                        value: _position.inSeconds.toDouble().clamp(0.0, _duration.inSeconds.toDouble()),
+                        onChanged: (double value){
+                          final newPosition=Duration(seconds: value.round());
+                          //Seeking tua video
+                          _player.seek(newPosition);
+                          //Cập nhật đoạn tua video
+                          setState(() =>_position=newPosition);
+                        },
+                    ),
+                    ),
+
+                    //3. Hiển thị thời gian ghi âm
+                    Text('${_formatDuration(_position)} / ${_formatDuration(_duration)}',
+                      style: const TextStyle(fontSize: 12 ),),
+                  ],
                 ),
-                onPressed: _togglePlayback,
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
     );
+  }
+  String _formatDuration(Duration d){
+    //Chuyển đổi duration thành mm:ss
+    final minutes=d.inMinutes.remainder(60).toString().padLeft(2,'0');
+    final seconds=d.inSeconds.remainder(60).toString().padLeft(2,'0');
+    return "$minutes:$seconds";
   }
 }
