@@ -21,6 +21,9 @@ namespace LoginApi.Models
         [Column("updated_at")]
         public DateTime? UpdatedAt { get; set; }
 
+        [Column("reminder_at")]
+        public DateTime? ReminderAt { get; set; }
+
         public User? User { get; set; }
 
         

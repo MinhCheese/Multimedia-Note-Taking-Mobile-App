@@ -36,6 +36,10 @@ namespace LoginApi.Controllers
                     n.Title,
                     n.Content,
                     n.CreatedAt,
+
+                    // 👇 1. THÊM DÒNG NÀY ĐỂ TRẢ VỀ LỊCH HẸN
+                    ReminderAt = n.ReminderAt,
+
                     Tags = n.NoteTags.Select(nt => nt.Tag.Name).ToList(),
                     MediaFiles = n.MediaFiles.Select(m => new
                     {
@@ -67,7 +71,10 @@ namespace LoginApi.Controllers
                 Title = request.Title,
                 Content = request.Content,
                 CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
+                IsDeleted = false,
+
+                // 👇 2. THÊM DÒNG NÀY ĐỂ LƯU LỊCH HẸN KHI TẠO MỚI
+                ReminderAt = request.ReminderAt
             };
 
             _context.Notes.Add(note);
@@ -110,6 +117,9 @@ namespace LoginApi.Controllers
             note.Title = request.Title;
             note.Content = request.Content;
 
+            // 👇 3. THÊM DÒNG NÀY ĐỂ CẬP NHẬT HOẶC XÓA LỊCH HẸN
+            note.ReminderAt = request.ReminderAt;
+
             // Xóa hết tag cũ
             var existingTags = _context.NoteTags.Where(nt => nt.NoteId == id);
             _context.NoteTags.RemoveRange(existingTags);
@@ -139,6 +149,7 @@ namespace LoginApi.Controllers
             return Ok(new { message = "Note updated successfully" });
         }
 
+        // ... Các hàm Delete, Upload giữ nguyên ...
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteNote(Guid id)
         {
@@ -151,7 +162,6 @@ namespace LoginApi.Controllers
 
             note.IsDeleted = true;
 
-            // Soft delete media files liên kết
             foreach (var media in note.MediaFiles)
             {
                 media.IsDeleted = true;
@@ -160,9 +170,6 @@ namespace LoginApi.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-
-
-
 
         [HttpPost("upload-audio")]
         public async Task<IActionResult> UploadAudio([FromForm] IFormFile file, [FromForm] Guid noteId, [FromForm] string displayName)
@@ -200,7 +207,7 @@ namespace LoginApi.Controllers
             return Ok(new
             {
                 message = "Tải file ghi âm thành công!",
-                filePath = relativePath // ✅ Trả về cho phía Flutter
+                filePath = relativePath
             });
         }
 
@@ -257,7 +264,7 @@ namespace LoginApi.Controllers
             return Ok(new
             {
                 message = "Tải ảnh lên thành công!",
-                filePath = relativePath // ✅ Flutter sẽ lấy để hiển thị ảnh
+                filePath = relativePath
             });
         }
 
@@ -267,21 +274,14 @@ namespace LoginApi.Controllers
             if (string.IsNullOrEmpty(request.FilePath))
                 return BadRequest(new { message = "Thiếu đường dẫn file" });
 
-            // Tìm media file trong database
             var media = await _context.MediaFiles.FirstOrDefaultAsync(m => m.FilePath == request.FilePath && !m.IsDeleted);
             if (media == null)
                 return NotFound(new { message = "Không tìm thấy file" });
 
-            // ❗ Chỉ đánh dấu là đã xoá (soft delete)
             media.IsDeleted = true;
 
             await _context.SaveChangesAsync();
             return Ok(new { message = "Đã xoá media thành công" });
         }
-
-
-
-
     }
-
 }
