@@ -13,6 +13,7 @@ import 'package:path/path.dart' as path;
 import 'package:thuc_tap/services/media_service.dart';
 import 'package:intl/intl.dart';
 import 'package:thuc_tap/services/notification_service.dart';
+
 class EditNotePage extends StatefulWidget {
   final NoteModel note;
   final String token;
@@ -30,15 +31,19 @@ class _EditNotePageState extends State<EditNotePage> {
   late FocusNode _contentFocusNode;
   String selectedLabel = '';
   final List<String> availableLabels = ['Học tập', 'Công việc', 'Cá nhân', 'Khác'];
+
   final ImagePicker _picker = ImagePicker();
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
+
   bool _isRecording = false;
   String? _newAudioPath;
   late List<MediaFile> _visibleMediaFiles;
+
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _lastRecognized = '';
   DateTime? _reminderTime;
+
   @override
   void initState() {
     super.initState();
@@ -54,23 +59,20 @@ class _EditNotePageState extends State<EditNotePage> {
     _speech = stt.SpeechToText();
   }
 
-
   Future<void> _pickDateTime() async {
     final now = DateTime.now();
     final initialDate = _reminderTime ?? now;
 
-    // Day
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: initialDate,
-      firstDate: now.subtract(const Duration(minutes: 1)), // Cho phép chọn từ hiện tại
+      firstDate: now.subtract(const Duration(minutes: 1)),
       lastDate: DateTime(now.year + 5),
     );
 
     if (pickedDate == null) return;
     if (!mounted) return;
 
-    // Hour
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(initialDate),
@@ -95,9 +97,11 @@ class _EditNotePageState extends State<EditNotePage> {
     if (!micStatus.isGranted) {
       final requested = await Permission.microphone.request();
       if (!requested.isGranted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('❌ Vui lòng cấp quyền microphone')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('❌ Vui lòng cấp quyền microphone')),
+          );
+        }
         return;
       }
     }
@@ -114,10 +118,9 @@ class _EditNotePageState extends State<EditNotePage> {
 
     if (!_isRecording) {
       final dir = await getTemporaryDirectory();
-      final fileName = await _askFileName(); // Hàm popup nhập tên
+      final fileName = await _askFileName();
       if (fileName == null || fileName.trim().isEmpty) return;
 
-      // Sử dụng bộ lọc an toàn hơn cho tiếng Việt
       final sanitizedFileName = fileName.trim().replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
       final filePath = path.join(dir.path, '$sanitizedFileName.aac');
 
@@ -164,38 +167,48 @@ class _EditNotePageState extends State<EditNotePage> {
             ));
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(' Ghi âm và lưu thành công')),
+            const SnackBar(content: Text('🎙️ Ghi âm và lưu thành công')),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(' Lưu file ghi âm thất bại')),
+            const SnackBar(content: Text('❌ Lưu file ghi âm thất bại')),
           );
         }
       }
     }
   }
 
-
+  // ========================================================
+  // PHẦN CHỈ TẢI ẢNH (Không dính dáng tới OCR nữa)
+  // ========================================================
   Future<void> _pickImageFromCamera() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 80);
     if (pickedFile != null) {
       await _uploadImage(File(pickedFile.path));
     }
   }
 
   Future<void> _pickImageFromGallery() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (pickedFile != null) {
       await _uploadImage(File(pickedFile.path));
     }
   }
 
   Future<void> _uploadImage(File imageFile) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
     final uploadResult = await NoteService.uploadImageFile(
       token: widget.token,
       noteId: widget.note.id,
       filePath: imageFile.path,
     );
+
+    if (mounted) Navigator.pop(context); // Tắt loading
 
     if (uploadResult != null) {
       final filePathFromServer = uploadResult['filePath'];
@@ -205,27 +218,93 @@ class _EditNotePageState extends State<EditNotePage> {
         _visibleMediaFiles.add(newImage);
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('📷 Ảnh đã được tải lên thành công')),
+        const SnackBar(content: Text('📷 Ảnh đính kèm đã được lưu')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(' Lỗi khi tải ảnh lên')),
+        const SnackBar(content: Text('❌ Lỗi khi tải ảnh lên')),
       );
     }
   }
+
+  // ========================================================
+  // PHẦN NÚT OCR CHUYÊN DỤNG MỚI
+  // ========================================================
+  Future<void> _performOCR() async {
+    // 1. Cho người dùng chọn chụp mới hay lấy từ thư viện
+    final source = await showDialog<ImageSource>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Chọn nguồn ảnh'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, ImageSource.camera),
+            child: const Text('Máy ảnh'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, ImageSource.gallery),
+            child: const Text('Thư viện'),
+          ),
+        ],
+      ),
+    );
+
+    if (source == null) return;
+
+    final pickedFile = await _picker.pickImage(source: source, imageQuality: 80);
+    if (pickedFile == null) return;
+
+    // 2. Gửi cho Python AI đọc
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: Colors.green),
+            SizedBox(height: 15),
+            Text(
+                "AI đang quét văn bản...",
+                style: TextStyle(color: Colors.white, decoration: TextDecoration.none, fontSize: 14)
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final recognizedText = await NoteService.predictHandwriting(pickedFile.path);
+
+    if (mounted) Navigator.pop(context); // Tắt loading AI
+
+    if (recognizedText != null && recognizedText.trim().isNotEmpty) {
+      setState(() {
+        // Chèn vào chỗ con trỏ đang đứng hoặc nối vào cuối
+        _contentController.text += "\n\n$recognizedText";
+        _contentController.selection = TextSelection.fromPosition(TextPosition(offset: _contentController.text.length));
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ Đã quét và chèn chữ thành công!')));
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('⚠️ AI không tìm thấy chữ trong ảnh.')));
+      }
+    }
+  }
+
+  // ========================================================
 
   Future<void> _updateNote() async {
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
 
-    // 1. Hiện Loading
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
-    // 2. Gọi API Cập nhật
     final success = await NoteService.updateNote(
       token: widget.token,
       noteId: widget.note.id,
@@ -235,16 +314,13 @@ class _EditNotePageState extends State<EditNotePage> {
       reminderAt: _reminderTime,
     );
 
-    // 3. Tắt Loading ngay lập tức
     if (mounted) Navigator.pop(context);
 
     if (success) {
-      // 4. Xử lý thông báo (Trong try-catch để không chặn Navigation)
       try {
         final notificationId = widget.note.id.hashCode;
 
         if (_reminderTime != null) {
-          // Nếu có giờ hẹn -> Đặt lịch (Update lại lịch cũ)
           await NotificationService.scheduleNotification(
             id: notificationId,
             title: title.isEmpty ? 'Nhắc nhở' : title,
@@ -252,62 +328,54 @@ class _EditNotePageState extends State<EditNotePage> {
             scheduledTime: _reminderTime!,
           );
         } else {
-          // Nếu người dùng đã xóa giờ hẹn -> Hủy thông báo cũ
           await NotificationService.cancelNotification(notificationId);
         }
       } catch (e) {
-        print(" Lỗi cập nhật thông báo: $e");
+        print("Lỗi cập nhật thông báo: $e");
       }
 
-      // 5. Về Home (Chắc chắn chạy)
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(' Đã cập nhật ghi chú')));
-        Navigator.pop(context, true); // Trả về true để Home reload
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ Đã cập nhật ghi chú')));
+        Navigator.pop(context, true);
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(' Cập nhật thất bại')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('❌ Cập nhật thất bại')));
       }
     }
   }
 
   Future<void> _deleteNote() async {
-    // 1. Hỏi xác nhận
     final confirm = await DeleteNoteDialog.show(context);
     if (confirm != true) return;
 
-    // 2. Hiện Loading
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => const Center(child: CircularProgressIndicator()),
     );
 
-    // 3. Gọi API Xóa
     final success = await NoteService.deleteNote(
       token: widget.token,
       noteId: widget.note.id,
     );
 
-    // 4. Tắt Loading
     if (mounted) Navigator.pop(context);
 
     if (success) {
-      // 5. Hủy thông báo đi kèm (Try-catch)
       try {
         await NotificationService.cancelNotification(widget.note.id.hashCode);
       } catch (e) {
-        print(" Lỗi hủy thông báo: $e");
+        print("Lỗi hủy thông báo: $e");
       }
 
-      // 6. Về Home
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(' Đã xoá ghi chú')));
-        Navigator.pop(context, true); // Trả về true để reload list
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🗑️ Đã xoá ghi chú')));
+        Navigator.pop(context, true);
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Xoá thất bại')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('❌ Xoá thất bại')));
       }
     }
   }
@@ -391,11 +459,11 @@ class _EditNotePageState extends State<EditNotePage> {
           _visibleMediaFiles.removeWhere((m) => m.filePath == audioFile.filePath);
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ghi âm đã được xoá')),
+          const SnackBar(content: Text('🗑️ Ghi âm đã được xoá')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Xoá ghi âm thất bại')),
+          const SnackBar(content: Text('❌ Xoá ghi âm thất bại')),
         );
       }
     }
@@ -455,60 +523,6 @@ class _EditNotePageState extends State<EditNotePage> {
     );
     return fileName;
   }
-
-  Future<void> _renameAudio(MediaFile audio) async {
-    final controller = TextEditingController(text: audio.displayName?.replaceAll('.aac', '') ?? '');
-
-    final newName = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Đổi tên file ghi âm'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: 'Nhập tên mới'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Huỷ'),
-          ),
-          TextButton(
-            onPressed: () {
-              final name = controller.text.trim();
-              if (name.isNotEmpty) {
-                Navigator.pop(context, name);
-              }
-            },
-            child: const Text('Lưu'),
-          ),
-        ],
-      ),
-    );
-
-    if (newName != null &&
-        newName.isNotEmpty &&
-        newName != audio.displayName) {
-      try {
-        await MediaService.renameAudioFile(audio.id!, newName);
-
-        setState(() {
-          audio.displayName = newName;
-        });
-
-        // Hiển thị SnackBar báo thành công (nếu bạn muốn)
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đổi tên thành công')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đổi tên thất bại')),
-        );
-      }
-    }
-
-  }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -587,7 +601,7 @@ class _EditNotePageState extends State<EditNotePage> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    _getRemainingTime(_reminderTime!), // Hàm tính thời gian còn lại
+                                    _getRemainingTime(_reminderTime!),
                                     style: TextStyle(
                                         color: _reminderTime!.isBefore(DateTime.now()) ? Colors.red : Colors.green,
                                         fontSize: 13,
@@ -601,7 +615,7 @@ class _EditNotePageState extends State<EditNotePage> {
                               icon: const Icon(Icons.close, color: Colors.grey),
                               onPressed: () {
                                 setState(() {
-                                  _reminderTime = null; // Xoá lịch hẹn
+                                  _reminderTime = null;
                                 });
                               },
                             )
@@ -609,6 +623,23 @@ class _EditNotePageState extends State<EditNotePage> {
                         ),
                       ),
                     const SizedBox(height: 16),
+
+                    // NÚT OCR "MỜ" NẰM TRÊN KHUNG NỘI DUNG
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: _performOCR,
+                        icon: const Icon(Icons.document_scanner_outlined, color: Colors.black54, size: 18),
+                        label: const Text('Quét chữ từ ảnh', style: TextStyle(color: Colors.black54, fontSize: 13)),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+
                     _buildInputContainer(
                       height: 400,
                       child: TextField(
@@ -620,6 +651,7 @@ class _EditNotePageState extends State<EditNotePage> {
                         decoration: const InputDecoration(hintText: 'Nội dung ghi chú...', border: InputBorder.none),
                       ),
                     ),
+
                     const SizedBox(height: 16),
                     if (_visibleMediaFiles.any((file) => file.fileType == 'image'))
                       Column(
@@ -709,15 +741,9 @@ class _EditNotePageState extends State<EditNotePage> {
                                                     ),
                                                   ),
                                                 ),
-                                                // IconButton(
-                                                //   icon: const Icon(Icons.edit, size: 18),
-                                                //   onPressed: () => _renameAudio(audio),
-                                                //   tooltip: 'Đổi tên',
-                                                // )
                                               ],
                                             ),
                                           ),
-
                                         AudioPlayerWidget(audioUrl: audioUrl),
                                       ],
                                     ),
@@ -740,8 +766,6 @@ class _EditNotePageState extends State<EditNotePage> {
                                 ],
                               );
                             }),
-
-
                           ],
                         ),
                       )
@@ -806,7 +830,6 @@ class _EditNotePageState extends State<EditNotePage> {
               }
             },
           ),
-
         ],
       ),
     );
@@ -844,6 +867,7 @@ class _EditNotePageState extends State<EditNotePage> {
       child: child,
     );
   }
+
   String _getRemainingTime(DateTime target) {
     final now = DateTime.now();
     final difference = target.difference(now);
@@ -864,6 +888,7 @@ class _EditNotePageState extends State<EditNotePage> {
       return 'Còn $minutes phút nữa';
     }
   }
+
   void _showLabelPicker() {
     showModalBottomSheet(
       context: context,

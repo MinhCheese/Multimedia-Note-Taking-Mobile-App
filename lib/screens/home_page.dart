@@ -6,6 +6,7 @@ import 'package:thuc_tap/services/note_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thuc_tap/screens/add_note_page.dart';
 import 'package:thuc_tap/screens/edit_note_page.dart';
+import 'package:thuc_tap/screens/ai_voice_note_page.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
@@ -219,25 +220,58 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final prefs = await SharedPreferences.getInstance();
-          final token = prefs.getString('token');
-          if (token != null) {
-            final shouldRefresh = await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AddNotePage(token: token)),
-            );
-            if (shouldRefresh == true) {
-              setState(() => isLoading = true);
-              await loadNotes();
-            }
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng đăng nhập lại')));
-          }
-        },
-        backgroundColor: Colors.green[400],
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // NÚT 1: TẠO GHI CHÚ BẰNG GIỌNG NÓI AI (Mới)
+          FloatingActionButton(
+            heroTag: 'ai_note_btn', // Bắt buộc phải có heroTag khác nhau khi dùng nhiều FAB
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              final token = prefs.getString('token');
+              if (token != null) {
+                final shouldRefresh = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AIVoiceNotePage(token: token)),
+                );
+                // Nếu trang AI trả về true (đã lưu thành công), thì load lại danh sách
+                if (shouldRefresh == true) {
+                  setState(() => isLoading = true);
+                  await loadNotes();
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng đăng nhập lại')));
+              }
+            },
+            backgroundColor: Colors.orange,
+            child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
+          ),
+
+          const SizedBox(height: 16), // Khoảng cách giữa 2 nút
+
+          // NÚT 2: TẠO GHI CHÚ THỦ CÔNG (Cũ)
+          FloatingActionButton(
+            heroTag: 'manual_note_btn',
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              final token = prefs.getString('token');
+              if (token != null) {
+                final shouldRefresh = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddNotePage(token: token)),
+                );
+                if (shouldRefresh == true) {
+                  setState(() => isLoading = true);
+                  await loadNotes();
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng đăng nhập lại')));
+              }
+            },
+            backgroundColor: Colors.green[400],
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        ],
       ),
     );
   }

@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace LoginApi.Helpers  // dùng đúng namespace theo project của bạn
+namespace LoginApi.Helpers  
 {
     public class JwtHelper
     {

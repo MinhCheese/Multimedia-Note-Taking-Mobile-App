@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace LoginApi.Controllers
 {
@@ -117,14 +120,14 @@ namespace LoginApi.Controllers
             note.Title = request.Title;
             note.Content = request.Content;
 
-            // 👇 3. THÊM DÒNG NÀY ĐỂ CẬP NHẬT HOẶC XÓA LỊCH HẸN
+            
             note.ReminderAt = request.ReminderAt;
 
-            // Xóa hết tag cũ
+            
             var existingTags = _context.NoteTags.Where(nt => nt.NoteId == id);
             _context.NoteTags.RemoveRange(existingTags);
 
-            // Gắn tags mới
+            
             foreach (var tagName in request.Tags)
             {
                 var tag = await _context.Tags.FirstOrDefaultAsync(t => t.Name == tagName);
@@ -149,7 +152,7 @@ namespace LoginApi.Controllers
             return Ok(new { message = "Note updated successfully" });
         }
 
-        // ... Các hàm Delete, Upload giữ nguyên ...
+       
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteNote(Guid id)
         {
@@ -282,6 +285,53 @@ namespace LoginApi.Controllers
 
             await _context.SaveChangesAsync();
             return Ok(new { message = "Đã xoá media thành công" });
+        }
+
+        private static readonly HttpClient _ocrClient = new HttpClient();
+
+        [HttpPost("scan-handwriting")]
+        public async Task<IActionResult> ScanHandwriting([FromForm] IFormFile file)
+        {
+            
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "File ảnh không hợp lệ hoặc rỗng" });
+
+            try
+            {
+                // 1. Chuẩn bị dữ liệu gửi sang Python AI Service (Port 5000)
+                using var content = new MultipartFormDataContent();
+                using var stream = file.OpenReadStream();
+                var fileContent = new StreamContent(stream);
+
+                // Thiết lập Content-Type cho file gửi đi khớp với định dạng ảnh (jpg, png...)
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+                content.Add(fileContent, "file", file.FileName);
+
+                // 2. Gọi API của Python Service đã tạo ở bước trước
+                // Đảm bảo file ocr_service.py đang chạy tại 127.0.0.1:5000
+                var response = await _ocrClient.PostAsync("http://127.0.0.1:5000/predict-ocr", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonString = await response.Content.ReadAsStringAsync();
+
+                    // Giải mã kết quả trả về từ Python
+                    var result = JsonSerializer.Deserialize<OcrResponseDto>(jsonString, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    // Trả về text nhận diện được cho Flutter
+                    return Ok(new { text = result?.Result });
+                }
+
+                return StatusCode(500, new { message = "AI Service không phản hồi hoặc gặp lỗi xử lý." });
+            }
+            catch (Exception ex)
+            {
+                
+                return StatusCode(500, new { message = $"Lỗi kết nối AI Service: {ex.Message}" });
+            }
         }
     }
 }

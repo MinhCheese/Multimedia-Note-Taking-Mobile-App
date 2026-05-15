@@ -29,6 +29,10 @@
       "PackagePath": "staticwebassets\\uploads\\audio\\29eaafa9-18a7-4929-8848-fa1032b3f3fa.aac"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\audio\\35dd4585-6dd3-4f0c-a942-294d2771001e.aac",
+      "PackagePath": "staticwebassets\\uploads\\audio\\35dd4585-6dd3-4f0c-a942-294d2771001e.aac"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\audio\\3a41f099-83d1-438c-8a0f-38ecd8ece12d.aac",
       "PackagePath": "staticwebassets\\uploads\\audio\\3a41f099-83d1-438c-8a0f-38ecd8ece12d.aac"
     },
@@ -55,6 +59,10 @@
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\audio\\694bc5bd-0298-4ecc-9985-f080221616b7.aac",
       "PackagePath": "staticwebassets\\uploads\\audio\\694bc5bd-0298-4ecc-9985-f080221616b7.aac"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\audio\\8d8edf7e-6416-4b8a-ab06-aa3007820bd8.aac",
+      "PackagePath": "staticwebassets\\uploads\\audio\\8d8edf7e-6416-4b8a-ab06-aa3007820bd8.aac"
     },
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\audio\\8daa1acd-fd17-4e51-8d2b-c71940ddd9cd.m4a",
@@ -177,6 +185,14 @@
       "PackagePath": "staticwebassets\\uploads\\images\\0485dabd-0712-4c0b-8e80-094eb090bdb2.jpg"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\0511070a-655a-448c-a1e8-07476399900a.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\0511070a-655a-448c-a1e8-07476399900a.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\09bd2d12-77a4-499e-8d3c-4688993f7b58.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\09bd2d12-77a4-499e-8d3c-4688993f7b58.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\0ce09fb6-8bce-460d-80a9-7b1509e41930.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\0ce09fb6-8bce-460d-80a9-7b1509e41930.jpg"
     },
@@ -185,12 +201,28 @@
       "PackagePath": "staticwebassets\\uploads\\images\\116519f9-2d43-49e7-bb2a-f519a5fe50b0.jpg"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\15bcefbc-513c-4212-8fa6-541a3c864e32.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\15bcefbc-513c-4212-8fa6-541a3c864e32.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\166c2954-31f6-4d5f-ba20-275acb06c472.png",
       "PackagePath": "staticwebassets\\uploads\\images\\166c2954-31f6-4d5f-ba20-275acb06c472.png"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\17a4e629-fc77-48b8-9a75-d1f6424cff39.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\17a4e629-fc77-48b8-9a75-d1f6424cff39.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\18621f7f-2ae2-4bd2-bc16-769f5c044eac.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\18621f7f-2ae2-4bd2-bc16-769f5c044eac.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\2043aa79-47fb-4fb8-b9cf-be01df581e54.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\2043aa79-47fb-4fb8-b9cf-be01df581e54.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\27a552bc-88d1-4249-a08f-32cae9902f8f.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\27a552bc-88d1-4249-a08f-32cae9902f8f.jpg"
     },
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\27d43352-7c9c-481c-a445-f8182c91f607.jpg",
@@ -205,8 +237,16 @@
       "PackagePath": "staticwebassets\\uploads\\images\\31cc36e0-57cc-478b-9cbe-f462c96f3541.jpg"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\3c21e317-5939-4952-b41d-4b417666e613.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\3c21e317-5939-4952-b41d-4b417666e613.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\42969df9-6ed5-42e6-8dcb-bb419bc4dd11.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\42969df9-6ed5-42e6-8dcb-bb419bc4dd11.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\42a26320-368b-4b63-9328-421c36bb065f.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\42a26320-368b-4b63-9328-421c36bb065f.jpg"
     },
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\48fd6f2a-a9dc-434e-83e7-0c058a2cfc2f.jpg",
@@ -229,44 +269,172 @@
       "PackagePath": "staticwebassets\\uploads\\images\\5848dd5d-eea5-44b2-a0c5-9f4fffb85a1a.jpg"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\5a53faa3-8b4e-4abf-8b23-410e7d10b8fe.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\5a53faa3-8b4e-4abf-8b23-410e7d10b8fe.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\5e4baefb-a491-4729-89ec-e6ab7bcd5ad6.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\5e4baefb-a491-4729-89ec-e6ab7bcd5ad6.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\6590b2ab-5d80-4073-8b71-e65d3e537a9d.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\6590b2ab-5d80-4073-8b71-e65d3e537a9d.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\663aefb8-4b4f-4845-b3d5-45210b18a00d.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\663aefb8-4b4f-4845-b3d5-45210b18a00d.jpg"
     },
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\6a199bea-05d9-414e-9175-2975438880cf.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\6a199bea-05d9-414e-9175-2975438880cf.jpg"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\6e3a73f8-4343-4c9d-b2a9-0f31f025cffc.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\6e3a73f8-4343-4c9d-b2a9-0f31f025cffc.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\6fbd69b9-34df-4973-9148-a66d74ab3acd.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\6fbd69b9-34df-4973-9148-a66d74ab3acd.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\70b469cb-52fa-4e4f-a198-cda14084f1fb.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\70b469cb-52fa-4e4f-a198-cda14084f1fb.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\71a20097-6f84-4ef4-bbe4-a311cfed20a3.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\71a20097-6f84-4ef4-bbe4-a311cfed20a3.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\769a3ac1-1864-4384-b9dc-fd556e24c020.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\769a3ac1-1864-4384-b9dc-fd556e24c020.jpg"
     },
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\76a680af-3689-4b4f-9894-bfaa720587fa.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\76a680af-3689-4b4f-9894-bfaa720587fa.jpg"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\78a5d4a0-fcbe-4a43-94db-eeb1a6c15fd9.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\78a5d4a0-fcbe-4a43-94db-eeb1a6c15fd9.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\7e28ad7e-4c71-4bb8-bbeb-fbbb5143b301.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\7e28ad7e-4c71-4bb8-bbeb-fbbb5143b301.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\7e58a2bf-a139-449e-8352-802ebacd2164.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\7e58a2bf-a139-449e-8352-802ebacd2164.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\806cd0cd-26c8-4a26-9a97-46ec21cbf218.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\806cd0cd-26c8-4a26-9a97-46ec21cbf218.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\82768430-3471-4597-9ae7-cf325b84035a.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\82768430-3471-4597-9ae7-cf325b84035a.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\8942d999-80df-46b7-bdd6-8cf81f3dec8e.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\8942d999-80df-46b7-bdd6-8cf81f3dec8e.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\91efa0b7-af0a-4c1a-ba7f-7c4b5387a80b.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\91efa0b7-af0a-4c1a-ba7f-7c4b5387a80b.jpg"
     },
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\93abac36-aa8a-4ef6-a3b7-29fc47eed1f2.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\93abac36-aa8a-4ef6-a3b7-29fc47eed1f2.jpg"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\9af8d0f5-2045-40ae-b6fc-3c94840e1d55.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\9af8d0f5-2045-40ae-b6fc-3c94840e1d55.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\9f2f0636-d9e4-4abb-a848-115bd69cb13f.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\9f2f0636-d9e4-4abb-a848-115bd69cb13f.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\9ff3dfe9-b04b-43e1-8e19-fa650fc93f8c.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\9ff3dfe9-b04b-43e1-8e19-fa650fc93f8c.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\a09fe8c4-2407-4e57-a74f-cd93d77eb09f.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\a09fe8c4-2407-4e57-a74f-cd93d77eb09f.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\a45c0219-4541-4155-9a97-9b0765b15ec1.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\a45c0219-4541-4155-9a97-9b0765b15ec1.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\adafcbfd-a833-41c5-a690-c3672b2a92d7.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\adafcbfd-a833-41c5-a690-c3672b2a92d7.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\af555bc4-b97d-4f0f-871e-9478d1d0925a.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\af555bc4-b97d-4f0f-871e-9478d1d0925a.jpg"
     },
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\b0771fa2-3f3d-4809-93e0-ff7c11779603.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\b0771fa2-3f3d-4809-93e0-ff7c11779603.jpg"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\b2b1d6c8-03a1-43c8-bb1f-bb2fe71fce72.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\b2b1d6c8-03a1-43c8-bb1f-bb2fe71fce72.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\b4362f22-e449-484a-ace8-515f13d4a0f6.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\b4362f22-e449-484a-ace8-515f13d4a0f6.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\b46ddfca-ba6c-43e0-a8cc-fe6813e78930.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\b46ddfca-ba6c-43e0-a8cc-fe6813e78930.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\b66151ac-1a08-4e60-b320-b69c167c3488.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\b66151ac-1a08-4e60-b320-b69c167c3488.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\c5c34782-16e0-44e2-b251-975d86cca57b.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\c5c34782-16e0-44e2-b251-975d86cca57b.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\cab4c36c-4ed1-4134-92aa-6806272a59b0.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\cab4c36c-4ed1-4134-92aa-6806272a59b0.jpg"
     },
     {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\cd523485-9768-4a8b-90f9-a2c09aa296f9.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\cd523485-9768-4a8b-90f9-a2c09aa296f9.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\cef9e6ed-1c58-4fd1-a97a-fd785dd2d91d.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\cef9e6ed-1c58-4fd1-a97a-fd785dd2d91d.jpg"
+    },
+    {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\cf848f1b-6a2b-4572-8e6c-31719da2c81c.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\cf848f1b-6a2b-4572-8e6c-31719da2c81c.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\d7c926dc-c812-4b51-b07a-005b9c8644a1.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\d7c926dc-c812-4b51-b07a-005b9c8644a1.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\d8ed57aa-8841-4e1a-bd6a-c0b990c5fb03.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\d8ed57aa-8841-4e1a-bd6a-c0b990c5fb03.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\dc789109-907e-46c3-b75d-9a130741270d.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\dc789109-907e-46c3-b75d-9a130741270d.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\dd52dce5-659e-4ee8-9705-35ae53fc212f.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\dd52dce5-659e-4ee8-9705-35ae53fc212f.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\df263959-5c84-4c7f-9522-ca29e17ee2d7.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\df263959-5c84-4c7f-9522-ca29e17ee2d7.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\e33cc5a5-473f-4267-941e-5f380fa59ce8.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\e33cc5a5-473f-4267-941e-5f380fa59ce8.jpg"
     },
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\e7558879-6bb5-4ce6-bc73-e20c61ec5f6e.jpg",
@@ -275,6 +443,26 @@
     {
       "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\e951c128-a5d9-4893-aba9-fca2f2b7e06d.jpg",
       "PackagePath": "staticwebassets\\uploads\\images\\e951c128-a5d9-4893-aba9-fca2f2b7e06d.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\f19d2054-e7a9-44da-b029-c6a5ef0d00db.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\f19d2054-e7a9-44da-b029-c6a5ef0d00db.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\f459bca6-a203-4082-aea0-21d2c41aeff4.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\f459bca6-a203-4082-aea0-21d2c41aeff4.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\f7f325a5-6afb-40bf-a4ab-1f6557985e9f.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\f7f325a5-6afb-40bf-a4ab-1f6557985e9f.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\fcceee84-bb3f-4b08-939d-600cb36b445d.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\fcceee84-bb3f-4b08-939d-600cb36b445d.jpg"
+    },
+    {
+      "Id": "C:\\Flutter\\thuc_tap\\Api\\LoginApi\\LoginApi\\wwwroot\\uploads\\images\\fe3985c5-8fdb-40ff-99f0-25f89c65717b.jpg",
+      "PackagePath": "staticwebassets\\uploads\\images\\fe3985c5-8fdb-40ff-99f0-25f89c65717b.jpg"
     },
     {
       "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.LoginApi.Microsoft.AspNetCore.StaticWebAssets.props",

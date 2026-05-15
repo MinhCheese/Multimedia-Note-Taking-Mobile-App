@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart'; // Thêm thư viện này
 import '../models/user_login_response.dart';
 import 'package:thuc_tap/models/user_register_dto.dart';
+
 class AuthService {
-  //Test may that 'http://192.168.100.29:5023' va dotnet run --urls=http://0.0.0.0:5023
-  //test may ao 'http://10.0.2.2:5023'
-  //'http://192.168.100.29:5023'
-  static const String baseUrl = 'http://192.168.100.29:5023';
+  static const String baseUrl = 'http://10.123.142.19:5023';
 
   static Future<UserLoginResponse?> login(String email, String password) async {
     final url = Uri.parse('$baseUrl/api/Auth/login');
@@ -26,18 +25,28 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
-        return UserLoginResponse.fromJson(jsonData);
+        final loginResponse = UserLoginResponse.fromJson(jsonData);
+
+        // 1. LƯU TOKEN LẠI ĐỂ DUY TRÌ ĐĂNG NHẬP
+        final prefs = await SharedPreferences.getInstance();
+        // Giả sử trong model UserLoginResponse của Chi có trường 'token'
+        if (loginResponse.token != null) {
+          await prefs.setString('jwt_token', loginResponse.token!);
+        }
+
+        return loginResponse;
       } else {
-        print('Login failed: ${response.statusCode}');
-        print('Body: ${response.body}');
-        return null;
+        // 2. TRẢ VỀ LỖI CHI TIẾT TỪ BACKEND ĐỂ UI HIỂN THỊ
+        final errorData = jsonDecode(response.body);
+        final errorMessage = errorData['message'] ?? 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
+        throw Exception(errorMessage);
       }
     } catch (e) {
-      print('Exception: $e');
-      return null;
+      // Bắt lỗi kết nối mạng (timeout, sập server, v.v.)
+      print('Login Exception: $e');
+      throw Exception('Không thể kết nối đến máy chủ. Lỗi: $e');
     }
   }
-
 
   static Future<bool> register(String name, String email, String password) async {
     final url = Uri.parse('$baseUrl/api/Auth/register');
@@ -59,14 +68,18 @@ class AuthService {
       if (response.statusCode == 200) {
         return true;
       } else {
-        print('Đăng ký thất bại: ${response.statusCode}');
-        print('Body: ${response.body}');
-        return false;
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['message'] ?? 'Đăng ký thất bại.');
       }
     } catch (e) {
-      print('Lỗi: $e');
-      return false;
+      print('Register Exception: $e');
+      throw Exception('Không thể kết nối đến máy chủ. Lỗi: $e');
     }
   }
 
+  // Bổ sung hàm đăng xuất để xóa Token
+  static Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwt_token');
+  }
 }

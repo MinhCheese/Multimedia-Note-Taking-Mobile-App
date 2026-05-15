@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:thuc_tap/models/note_model.dart';
 
 class MediaService {
-  static const String baseUrl = 'http://192.168.100.29:5023';
+  static const String baseUrl = 'http://10.123.142.19:5023';
 
   static Future<List<MediaFile>> fetchMediaFiles(String userId) async {
     final url = Uri.parse('$baseUrl/api/media/user/$userId');

@@ -6,8 +6,9 @@ import 'dart:io';
 class NoteService {
   //Test may that 'http://192.168.100.29:5023'
   //test may ao 'http://10.0.2.2:5023'
-  static const String baseUrl = 'http://192.168.100.29:5023';
-
+  //10.123.142.19
+  static const String baseUrl = 'http://10.123.142.19:5023';
+  static const String ocrBaseUrl = 'http://10.123.142.19:5000';
   static Future<List<NoteModel>> fetchNotesByUser(String userId) async {
     final response = await http.get(Uri.parse('$baseUrl/api/Notes/user/$userId'));
 
@@ -235,6 +236,39 @@ class NoteService {
     if (response.statusCode == 200) {
       return NoteModel.fromJson(json.decode(response.body));
     } else {
+      return null;
+    }
+  }
+
+  static Future<String?> predictHandwriting(String filePath) async {
+    try {
+      final uri = Uri.parse('$ocrBaseUrl/predict-ocr');
+      final request = http.MultipartRequest('POST', uri);
+
+      // Thêm file ảnh vào request
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          filePath,
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == 'success') {
+          print('✅ AI nhận diện: ${data['result']}');
+          return data['result'];
+        }
+      }
+
+      print('❌ AI Server lỗi: ${response.statusCode}');
+      return null;
+    } catch (e) {
+      print('❌ Không thể kết nối tới AI Server: $e');
       return null;
     }
   }
